@@ -2,6 +2,7 @@ package com.example.mycalendar;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class CalendarFragment extends Fragment implements AdapterListener{
 
@@ -124,14 +126,14 @@ public class CalendarFragment extends Fragment implements AdapterListener{
     }
 
     @Override
-    public void onItemLongClick(Event event, int position) {
+    public void onItemClick(final Event event, final int position) {
         this.position = position;
         new AlertDialog.Builder(requireContext())
-                .setMessage(R.string.delete)
+                .setMessage(R.string.share)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        removeEvent();
+                        share(eventList.get(position));
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -141,12 +143,43 @@ public class CalendarFragment extends Fragment implements AdapterListener{
                 }).show();
     }
 
-    private void removeEvent(){
+    @Override
+    public void onItemLongClick(Event event, int position) {
+        this.position = position;
+        new AlertDialog.Builder(requireContext())
+                .setMessage(R.string.delete)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteEvent();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                }).show();
+    }
+
+    private void deleteEvent(){
         int id = eventList.get(position).getId();
         dbHelper = new DBHelper(requireContext());
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         database.delete(DBHelper.TABLE_EVENTS, DBHelper.KEY_ID + " = " + id, null);
         dbHelper.close();
         getListOfTheDay();
+    }
+
+    private void share(Event event){
+        String month = String.valueOf(event.getMonth()+1);
+        String editMonth = month.length()<2 ? "0"+month : month;
+        String hour = String.valueOf(event.getHour()).length()<2 ? "0"+event.getHour() : String.valueOf(event.getHour());
+        String minute = String.valueOf(event.getMinute()).length()<2 ? "0"+event.getMinute() : String.valueOf(event.getMinute());
+        String toSend = String.format(Locale.US,"Event: %s - %d.%s.%d at %s:%s", event.getEvent(), event.getDay(), editMonth, event.getYear(), hour, minute);
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, toSend);
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
     }
 }

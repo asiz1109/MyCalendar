@@ -80,6 +80,12 @@ public class AdapterRV extends RecyclerView.Adapter<AdapterRV.ViewHolderRV> {
         }
 
         public void setListener(final Event item, final AdapterListener listener, final int position) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onItemClick(item, position);
+                }
+            });
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {

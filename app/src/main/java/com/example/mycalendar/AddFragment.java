@@ -248,6 +248,8 @@ public class AddFragment extends Fragment implements View.OnClickListener {
 
     private void closeFragment(){
         et_event.setText("");
+        cb_all_day.setChecked(false);
+        radioGroup.check(R.id.rb_not);
         dateTimeTracker.setDefaultDate();
         mainViewModel.setFragmentId(R.layout.fragment_calendar);
     }

@@ -15,5 +15,6 @@
     <string name="remind_in_30_minutes">Remind in 30 minutes</string>
     <string name="remind_in_1_hour">Remind in 1 hour</string>
     <string name="delete_event">Delete event</string>
-    <string name="delete">Delete selected event?</string>
+    <string name="delete">Do you want to delete this event?</string>
+    <string name="share">Do you want to share this event?</string>
 </resources>
