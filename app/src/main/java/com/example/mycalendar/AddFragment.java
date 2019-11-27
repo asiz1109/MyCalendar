@@ -2,6 +2,8 @@ package com.example.mycalendar;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -42,14 +44,17 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     private CheckBox cb_all_day;
     private MainViewModel mainViewModel;
     private DateTimeTracker dateTimeTracker;
+    private DBHelper dbHelper;
 
     private int mYear, mMonth, mDay, mHour, mMinute;
+    private int remind = 0;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainViewModel = ViewModelProviders.of(requireActivity()).get(MainViewModel.class);
         dateTimeTracker = ViewModelProviders.of(requireActivity()).get(DateTimeTracker.class);
+        dbHelper = new DBHelper(requireContext());
     }
 
     @Nullable
@@ -68,6 +73,25 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         tv_time = view.findViewById(R.id.tv_time);
         tv_time.setOnClickListener(this);
         radioGroup = view.findViewById(R.id.radio_group);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+                    case R.id.rb_not:
+                        remind = 0;
+                        break;
+                    case R.id.rb_10m:
+                        remind = 1;
+                        break;
+                    case R.id.rb_30m:
+                        remind = 2;
+                        break;
+                    case R.id.rb_1h:
+                        remind = 3;
+                        break;
+                }
+            }
+        });
         cb_all_day = view.findViewById(R.id.cb_all_day);
         cb_all_day.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -101,7 +125,25 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//          сохраняю в базу данных
+                int allDay = cb_all_day.isChecked()? 1 : 0;
+                SQLiteDatabase database = dbHelper.getWritableDatabase();
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(DBHelper.KEY_EVENT, et_event.getText().toString());
+                contentValues.put(DBHelper.KEY_DAY, dateTimeTracker.getDay().getValue());
+                contentValues.put(DBHelper.KEY_MONTH, dateTimeTracker.getMonth().getValue());
+                contentValues.put(DBHelper.KEY_YEAR, dateTimeTracker.getYear().getValue());
+                if (cb_all_day.isChecked()){
+                    contentValues.put(DBHelper.KEY_HOUR, 0);
+                    contentValues.put(DBHelper.KEY_MINUTE, 0);
+                } else {
+                    contentValues.put(DBHelper.KEY_HOUR, dateTimeTracker.getHour().getValue());
+                    contentValues.put(DBHelper.KEY_MINUTE, dateTimeTracker.getMinute().getValue());
+                }
+                contentValues.put(DBHelper.KEY_ALL_DAY, allDay);
+                contentValues.put(DBHelper.KEY_REMIND, remind);
+                database.insert(DBHelper.TABLE_EVENTS, null, contentValues);
+                dbHelper.close();
+                closeFragment();
             }
         });
 
@@ -157,9 +199,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.close) {
-            et_event.setText("");
-            dateTimeTracker.setDefaultDate();
-            mainViewModel.setFragmentId(R.layout.fragment_calendar);
+            closeFragment();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -206,4 +246,9 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         tv_time.setText(hour + ":" + minute);
     }
 
+    private void closeFragment(){
+        et_event.setText("");
+        dateTimeTracker.setDefaultDate();
+        mainViewModel.setFragmentId(R.layout.fragment_calendar);
+    }
 }
