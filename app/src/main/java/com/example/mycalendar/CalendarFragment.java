@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mycalendar.ViewModel.DateTimeTracker;
 import com.example.mycalendar.ViewModel.MainViewModel;
@@ -21,6 +23,8 @@ public class CalendarFragment extends Fragment {
     private FloatingActionButton btn_add;
     private MainViewModel mainViewModel;
     private DateTimeTracker dateTimeTracker;
+    private RecyclerView recyclerView;
+    private AdapterRV adapterRV;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,5 +57,9 @@ public class CalendarFragment extends Fragment {
                 mainViewModel.setFragmentId(R.layout.fragment_add);
             }
         });
+        recyclerView = view.findViewById(R.id.recycler_view);
+        adapterRV = new AdapterRV();
+        recyclerView.setAdapter(adapterRV);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
     }
 }

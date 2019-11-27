@@ -11,4 +11,7 @@
     <string name="new_event">New event</string>
     <string name="close">close</string>
     <string name="all_day">All day</string>
+    <string name="remind_in_10_minutes">Remind in 10 minutes</string>
+    <string name="remind_in_30_minutes">Remind in 30 minutes</string>
+    <string name="remind_in_1_hour">Remind in 1 hour</string>
 </resources>
