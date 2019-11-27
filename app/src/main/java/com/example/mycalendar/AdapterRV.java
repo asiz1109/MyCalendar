@@ -33,7 +33,7 @@ public class AdapterRV extends RecyclerView.Adapter<AdapterRV.ViewHolderRV> {
         return eventList.size();
     }
 
-    private void setList(List<Event> list){
+    public void setList(List<Event> list){
         eventList = list;
         notifyDataSetChanged();
     }
@@ -51,7 +51,11 @@ public class AdapterRV extends RecyclerView.Adapter<AdapterRV.ViewHolderRV> {
 
         public void bindItem (final Event event) {
             tv_event.setText(event.getEvent());
-            tv_time.setText(String.format(Locale.US, "%d:%d", event.getHour(), event.getMinute()));
+
+            String hour = String.valueOf(event.getHour()).length()<2 ? "0"+event.getHour() : String.valueOf(event.getHour());
+            String minute = String.valueOf(event.getMinute()).length()<2 ? "0"+event.getMinute() : String.valueOf(event.getMinute());
+            tv_time.setText(hour + ":" + minute);
+
             switch (event.getRemind()){
                 case 0:
                     tv_remind.setText(R.string.do_not_remind);

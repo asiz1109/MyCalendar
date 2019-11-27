@@ -13,20 +13,18 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:textColor="@android:color/black"
-        android:textSize="12sp"
+        android:textSize="15sp"
         tools:text="Event" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/item_time"
-            android:layout_width="match_parent"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="12sp"
             tools:text="12:30" />
 
@@ -34,9 +32,8 @@
             android:id="@+id/item_remind"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
             android:textSize="12sp"
+            android:layout_marginStart="10dp"
             tools:text="Remind in 1 hour" />
 
     </LinearLayout>
