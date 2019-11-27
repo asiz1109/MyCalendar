@@ -1,5 +1,7 @@
 package com.example.mycalendar;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -23,7 +25,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CalendarFragment extends Fragment {
+public class CalendarFragment extends Fragment implements AdapterListener{
 
     private CalendarView cv_calendar;
     private FloatingActionButton btn_add;
@@ -33,13 +35,13 @@ public class CalendarFragment extends Fragment {
     private AdapterRV adapterRV;
     private List<Event> eventList = new ArrayList<>();
     private DBHelper dbHelper;
+    private int position;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainViewModel = ViewModelProviders.of(requireActivity()).get(MainViewModel.class);
         dateTimeTracker = ViewModelProviders.of(requireActivity()).get(DateTimeTracker.class);
-        dbHelper = new DBHelper(requireContext());
     }
 
     @Nullable
@@ -68,6 +70,7 @@ public class CalendarFragment extends Fragment {
         });
         recyclerView = view.findViewById(R.id.recycler_view);
         adapterRV = new AdapterRV();
+        adapterRV.setListener(this);
         recyclerView.setAdapter(adapterRV);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         dateTimeTracker.getYear().observe(this, new Observer<Integer>() {
@@ -90,7 +93,9 @@ public class CalendarFragment extends Fragment {
         });
     }
 
+
     private void getListOfTheDay(){
+        dbHelper = new DBHelper(requireContext());
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         eventList.clear();
         String day = String.valueOf(dateTimeTracker.getDay().getValue());
@@ -116,5 +121,32 @@ public class CalendarFragment extends Fragment {
         cursor.close();
         dbHelper.close();
         adapterRV.setList(eventList);
+    }
+
+    @Override
+    public void onItemLongClick(Event event, int position) {
+        this.position = position;
+        new AlertDialog.Builder(requireContext())
+                .setMessage(R.string.delete)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        removeEvent();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                }).show();
+    }
+
+    private void removeEvent(){
+        int id = eventList.get(position).getId();
+        dbHelper = new DBHelper(requireContext());
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        database.delete(DBHelper.TABLE_EVENTS, DBHelper.KEY_ID + " = " + id, null);
+        dbHelper.close();
+        getListOfTheDay();
     }
 }

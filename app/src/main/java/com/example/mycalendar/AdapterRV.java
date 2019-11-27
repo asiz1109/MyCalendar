@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 public class AdapterRV extends RecyclerView.Adapter<AdapterRV.ViewHolderRV> {
 
     private List<Event> eventList = Collections.emptyList();
+    private AdapterListener adapterListener;
 
     @NonNull
     @Override
@@ -23,9 +23,10 @@ public class AdapterRV extends RecyclerView.Adapter<AdapterRV.ViewHolderRV> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolderRV holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolderRV holder, int position) {
         final Event event = eventList.get(position);
         holder.bindItem(event);
+        holder.setListener(event, adapterListener, position);
     }
 
     @Override
@@ -38,15 +39,21 @@ public class AdapterRV extends RecyclerView.Adapter<AdapterRV.ViewHolderRV> {
         notifyDataSetChanged();
     }
 
+    public void setListener(AdapterListener listener) {
+        adapterListener = listener;
+    }
+
     static class ViewHolderRV extends RecyclerView.ViewHolder{
 
-        TextView tv_event, tv_time, tv_remind;
+        private TextView tv_event, tv_time, tv_remind;
+        private View itemView;
 
         public ViewHolderRV(@NonNull View itemView) {
             super(itemView);
             tv_event = itemView.findViewById(R.id.item_event);
             tv_time = itemView.findViewById(R.id.item_time);
             tv_remind = itemView.findViewById(R.id.item_remind);
+            this.itemView = itemView;
         }
 
         public void bindItem (final Event event) {
@@ -70,6 +77,16 @@ public class AdapterRV extends RecyclerView.Adapter<AdapterRV.ViewHolderRV> {
                     tv_remind.setText(R.string.remind_in_1_hour);
                     break;
             }
+        }
+
+        public void setListener(final Event item, final AdapterListener listener, final int position) {
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    listener.onItemLongClick(item, position);
+                    return false;
+                }
+            });
         }
     }
 }
