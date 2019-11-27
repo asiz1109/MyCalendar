@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">My Calendar</string>
+    <string name="event">Event</string>
+    <string name="time">Time</string>
+    <string name="date">Date</string>
+    <string name="remind">Remind:</string>
+    <string name="do_not_remind">Do not remind</string>
+    <string name="in_10_minutes">In 10 minutes</string>
+    <string name="in_30_minutes">in 30 minutes</string>
+    <string name="in_1_hour">In 1 hour</string>
+    <string name="new_event">New event</string>
+    <string name="close">close</string>
+    <string name="all_day">All day</string>
+</resources>
