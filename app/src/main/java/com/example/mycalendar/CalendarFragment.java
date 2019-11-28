@@ -1,11 +1,16 @@
 package com.example.mycalendar;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,10 +167,19 @@ public class CalendarFragment extends Fragment implements AdapterListener{
     }
 
     private void deleteEvent(){
-        int id = eventList.get(position).getId();
+        Event event = eventList.get(position);
+        if(event.getRemind()>0) {
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
+            String idAlarm = sp.getString(event.getDay() + "." + event.getMonth() + "." + event.getYear() + "." + event.getHour() + "." + event.getMinute(), "");
+            AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(requireContext(), MyReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), Integer.parseInt(idAlarm), intent, 0);
+            alarmManager.cancel(pendingIntent);
+        }
+
         dbHelper = DBHelper.getInstance(requireContext());
         SQLiteDatabase database = dbHelper.getWritableDatabase();
-        database.delete(DBHelper.TABLE_EVENTS, DBHelper.KEY_ID + " = " + id, null);
+        database.delete(DBHelper.TABLE_EVENTS, DBHelper.KEY_ID + " = " + event.getId(), null);
         dbHelper.close();
         getListOfTheDay();
     }

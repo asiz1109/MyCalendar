@@ -59,13 +59,17 @@ public class AdapterRV extends RecyclerView.Adapter<AdapterRV.ViewHolderRV> {
         public void bindItem (final Event event) {
             tv_event.setText(event.getEvent());
 
-            String hour = String.valueOf(event.getHour()).length()<2 ? "0"+event.getHour() : String.valueOf(event.getHour());
-            String minute = String.valueOf(event.getMinute()).length()<2 ? "0"+event.getMinute() : String.valueOf(event.getMinute());
-            tv_time.setText(hour + ":" + minute);
+            if(event.getHour()==0 && event.getMinute()==0){
+                tv_time.setText(R.string.all_day);
+            } else {
+                String hour = String.valueOf(event.getHour()).length()<2 ? "0"+event.getHour() : String.valueOf(event.getHour());
+                String minute = String.valueOf(event.getMinute()).length()<2 ? "0"+event.getMinute() : String.valueOf(event.getMinute());
+                tv_time.setText(hour + ":" + minute);
+            }
 
             switch (event.getRemind()){
                 case 0:
-                    tv_remind.setText(R.string.do_not_remind);
+                    tv_remind.setText("");
                     break;
                 case 1:
                     tv_remind.setText(R.string.remind_in_10_minutes);

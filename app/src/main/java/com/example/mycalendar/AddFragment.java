@@ -1,10 +1,16 @@
 package com.example.mycalendar;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -25,6 +31,7 @@ import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.AlarmManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -33,6 +40,9 @@ import com.example.mycalendar.ViewModel.DateTimeTracker;
 import com.example.mycalendar.ViewModel.MainViewModel;
 
 import java.util.Calendar;
+import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 
 public class AddFragment extends Fragment implements View.OnClickListener {
@@ -48,6 +58,8 @@ public class AddFragment extends Fragment implements View.OnClickListener {
 
     private int mYear, mMonth, mDay, mHour, mMinute;
     private int remind = 0;
+
+//    public static final int RC_MY_ALARM = 101;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,10 +111,17 @@ public class AddFragment extends Fragment implements View.OnClickListener {
                 if (isChecked){
                     tv_time.setEnabled(false);
                     tv_time.setTextColor(getResources().getColor(R.color.enabled));
+                    radioGroup.check(R.id.rb_not);
+                    for (int i = 0; i < radioGroup.getChildCount(); i++) {
+                        radioGroup.getChildAt(i).setEnabled(false);
+                    }
                 }
                 else {
                     tv_time.setEnabled(true);
                     tv_time.setTextColor(getResources().getColor(R.color.black));
+                    for (int i = 0; i < radioGroup.getChildCount(); i++) {
+                        radioGroup.getChildAt(i).setEnabled(true);
+                    }
                 }
             }
         });
@@ -125,24 +144,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int allDay = cb_all_day.isChecked()? 1 : 0;
-                SQLiteDatabase database = dbHelper.getWritableDatabase();
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(DBHelper.KEY_EVENT, et_event.getText().toString());
-                contentValues.put(DBHelper.KEY_DAY, dateTimeTracker.getDay().getValue());
-                contentValues.put(DBHelper.KEY_MONTH, dateTimeTracker.getMonth().getValue());
-                contentValues.put(DBHelper.KEY_YEAR, dateTimeTracker.getYear().getValue());
-                if (cb_all_day.isChecked()){
-                    contentValues.put(DBHelper.KEY_HOUR, 0);
-                    contentValues.put(DBHelper.KEY_MINUTE, 0);
-                } else {
-                    contentValues.put(DBHelper.KEY_HOUR, dateTimeTracker.getHour().getValue());
-                    contentValues.put(DBHelper.KEY_MINUTE, dateTimeTracker.getMinute().getValue());
-                }
-                contentValues.put(DBHelper.KEY_ALL_DAY, allDay);
-                contentValues.put(DBHelper.KEY_REMIND, remind);
-                database.insert(DBHelper.TABLE_EVENTS, null, contentValues);
-                dbHelper.close();
+                addEvent();
                 closeFragment();
             }
         });
@@ -252,5 +254,66 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         radioGroup.check(R.id.rb_not);
         dateTimeTracker.setDefaultDate();
         mainViewModel.setFragmentId(R.layout.fragment_calendar);
+    }
+
+    private void addEvent(){
+        String event = et_event.getText().toString();
+        int day = Objects.requireNonNull(dateTimeTracker.getDay().getValue());
+        int month = Objects.requireNonNull(dateTimeTracker.getMonth().getValue());
+        int year = Objects.requireNonNull(dateTimeTracker.getYear().getValue());
+        int hour = Objects.requireNonNull(dateTimeTracker.getHour().getValue());
+        int minute = Objects.requireNonNull(dateTimeTracker.getMinute().getValue());
+        int allDay = cb_all_day.isChecked()? 1 : 0;
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DBHelper.KEY_EVENT, event);
+        contentValues.put(DBHelper.KEY_DAY, day);
+        contentValues.put(DBHelper.KEY_MONTH, month);
+        contentValues.put(DBHelper.KEY_YEAR, year);
+        if (cb_all_day.isChecked()){
+            contentValues.put(DBHelper.KEY_HOUR, 0);
+            contentValues.put(DBHelper.KEY_MINUTE, 0);
+        } else {
+            contentValues.put(DBHelper.KEY_HOUR, hour);
+            contentValues.put(DBHelper.KEY_MINUTE, minute);
+        }
+        contentValues.put(DBHelper.KEY_ALL_DAY, allDay);
+        contentValues.put(DBHelper.KEY_REMIND, remind);
+        database.insert(DBHelper.TABLE_EVENTS, null, contentValues);
+        dbHelper.close();
+        if(remind>0) addAlarm(event, day, month, year, hour, minute);
+    }
+
+    private void addAlarm(String event, int day, int month, int year, int hour, int minute){
+        Random random_idAlarm = new Random(System.currentTimeMillis());
+        final int idAlarm = random_idAlarm.nextInt(214748364);
+        String key = day+"."+month+"."+year+"."+hour+"."+minute;
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        sp.edit().putString(key, String.valueOf(idAlarm)).apply();
+
+        Intent intent = new Intent(requireContext(), MyReceiver.class);
+        intent.putExtra("event", event).putExtra("time", tv_time.getText().toString());
+        PendingIntent task = PendingIntent.getBroadcast(requireContext(), idAlarm, intent, 0);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+        long millis = 0;
+        switch (remind){
+            case 1:
+                millis = TimeUnit.MINUTES.toMillis(10);
+                break;
+            case 2:
+                millis = TimeUnit.MINUTES.toMillis(30);
+                break;
+            case 3:
+                millis = TimeUnit.HOURS.toMillis(1);
+                break;
+        }
+        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        AlarmManagerCompat.setExact(alarmManager, AlarmManager.RTC, calendar.getTimeInMillis()-millis, task);
     }
 }
