@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -22,9 +23,27 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_ALL_DAY = "all_day";
     public static final String KEY_REMIND = "remind";
 
-    public DBHelper(@Nullable Context context) {
+    private static volatile DBHelper mInstance;
+
+    private DBHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
+
+    @NonNull
+    static DBHelper getInstance(Context context){
+        DBHelper instance = mInstance;
+        if(instance==null){
+            synchronized (DBHelper.class){
+                instance = mInstance;
+                if(instance==null){
+                    instance = mInstance = new DBHelper(context);
+                }
+            }
+        }
+        return instance;
+    }
+
+
 
     @Override
     public void onCreate(SQLiteDatabase db) {

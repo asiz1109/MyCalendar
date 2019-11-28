@@ -51,7 +51,8 @@ public class MainActivity extends AppCompatActivity{
                 dateTimeTracker.setTime(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), Calendar.getInstance().get(Calendar.MINUTE));
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.fragment_container, addFragment)
+                        .add(R.id.fragment_container, addFragment)
+                        .addToBackStack(null)
                         .commit();
         }
     }

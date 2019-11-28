@@ -97,7 +97,7 @@ public class CalendarFragment extends Fragment implements AdapterListener{
 
 
     private void getListOfTheDay(){
-        dbHelper = new DBHelper(requireContext());
+        dbHelper = DBHelper.getInstance(requireContext());
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         eventList.clear();
         String day = String.valueOf(dateTimeTracker.getDay().getValue());
@@ -163,7 +163,7 @@ public class CalendarFragment extends Fragment implements AdapterListener{
 
     private void deleteEvent(){
         int id = eventList.get(position).getId();
-        dbHelper = new DBHelper(requireContext());
+        dbHelper = DBHelper.getInstance(requireContext());
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         database.delete(DBHelper.TABLE_EVENTS, DBHelper.KEY_ID + " = " + id, null);
         dbHelper.close();

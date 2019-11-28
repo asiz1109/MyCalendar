@@ -54,7 +54,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         mainViewModel = ViewModelProviders.of(requireActivity()).get(MainViewModel.class);
         dateTimeTracker = ViewModelProviders.of(requireActivity()).get(DateTimeTracker.class);
-        dbHelper = new DBHelper(requireContext());
+        dbHelper = DBHelper.getInstance(requireContext());
     }
 
     @Nullable

@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.mycalendar.R;
 
-import java.util.Objects;
-
 public class MainViewModel extends ViewModel {
 
     private MutableLiveData<String> mTitle = new MutableLiveData<>();
@@ -30,9 +28,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public void setFragmentId(int id) {
-        if (!Objects.equals(id, mFragmentId.getValue())) {
             mFragmentId.postValue(id);
-        }
     }
 
 }
