@@ -1,4 +1,6 @@
-package com.example.mycalendar;
+package com.example.mycalendar.RecyclerView;
+
+import com.example.mycalendar.BD.Event;
 
 public interface AdapterListener {
 

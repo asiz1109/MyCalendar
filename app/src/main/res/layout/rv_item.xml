@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingStart="20dp"
-    android:paddingEnd="10dp">
+    android:paddingStart="@dimen/padding_20"
+    android:paddingEnd="@dimen/padding_10">
 
     <TextView
         android:id="@+id/item_event"
@@ -14,7 +14,7 @@
         android:layout_marginTop="5dp"
         android:textColor="@android:color/black"
         android:textSize="15sp"
-        tools:text="Event" />
+        tools:text="@string/event" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,16 +25,16 @@
             android:id="@+id/item_time"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            tools:text="12:30" />
+            android:textSize="@dimen/text_12"
+            tools:text="@string/example_time" />
 
         <TextView
             android:id="@+id/item_remind"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:layout_marginStart="10dp"
-            tools:text="Remind in 1 hour" />
+            android:layout_marginStart="@dimen/padding_10"
+            android:textSize="@dimen/text_12"
+            tools:text="@string/example_remind" />
 
     </LinearLayout>
 

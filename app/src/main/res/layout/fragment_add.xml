@@ -1,35 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="@dimen/padding_20">
 
     <EditText
         android:id="@+id/et_event"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:hint="@string/event" />
+        android:layout_marginTop="@dimen/padding_20"
+        android:hint="@string/event"
+        tools:ignore="Autofill"
+        android:inputType="text" />
 
     <TextView
         android:id="@+id/tv_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/padding_20"
         android:background="@color/tv_background"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
         android:text="@string/date"
         android:textColor="@android:color/black"
-        android:textSize="20sp"/>
+        android:textSize="@dimen/text_20" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/padding_20"
         android:orientation="horizontal">
 
         <TextView
@@ -43,26 +46,26 @@
             android:gravity="center"
             android:text="@string/time"
             android:textColor="@android:color/black"
-            android:textSize="20sp"/>
+            android:textSize="@dimen/text_20" />
 
         <CheckBox
             android:id="@+id/cb_all_day"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_10"
             android:layout_weight="2"
             android:text="@string/all_day"
-            android:textSize="20sp"
-            android:layout_marginStart="10dp"/>
+            android:textSize="@dimen/text_20" />
 
     </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/padding_20"
         android:text="@string/remind"
         android:textColor="@android:color/black"
-        android:textSize="20sp" />
+        android:textSize="@dimen/text_20" />
 
     <RadioGroup
         android:id="@+id/radio_group"
@@ -100,7 +103,7 @@
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/padding_20"
         android:enabled="false"
         android:text="@android:string/ok" />
 </LinearLayout>

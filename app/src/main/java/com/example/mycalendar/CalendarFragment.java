@@ -24,6 +24,11 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mycalendar.Alarm.MyReceiver;
+import com.example.mycalendar.BD.DBHelper;
+import com.example.mycalendar.BD.Event;
+import com.example.mycalendar.RecyclerView.AdapterListener;
+import com.example.mycalendar.RecyclerView.AdapterRV;
 import com.example.mycalendar.ViewModel.DateTimeTracker;
 import com.example.mycalendar.ViewModel.MainViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -31,8 +36,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
-public class CalendarFragment extends Fragment implements AdapterListener{
+public class CalendarFragment extends Fragment implements AdapterListener {
 
     private CalendarView cv_calendar;
     private FloatingActionButton btn_add;
@@ -103,7 +109,7 @@ public class CalendarFragment extends Fragment implements AdapterListener{
 
     private void getListOfTheDay(){
         dbHelper = DBHelper.getInstance(requireContext());
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
         eventList.clear();
         String day = String.valueOf(dateTimeTracker.getDay().getValue());
         String month = String.valueOf(dateTimeTracker.getMonth().getValue());
@@ -113,15 +119,15 @@ public class CalendarFragment extends Fragment implements AdapterListener{
                 null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                int db_id = cursor.getInt(0);
-                String db_event = cursor.getString(1);
-                int db_day = cursor.getInt(2);
-                int db_month = cursor.getInt(3);
-                int db_year = cursor.getInt(4);
-                int db_hour = cursor.getInt(5);
-                int db_minute = cursor.getInt(6);
-                int db_all_day = cursor.getInt(7);
-                int db_remind = cursor.getInt(8);
+                int db_id = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_ID));
+                String db_event = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_EVENT));
+                int db_day = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_DAY));
+                int db_month = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_MONTH));
+                int db_year = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_YEAR));
+                int db_hour = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_HOUR));
+                int db_minute = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_MINUTE));
+                int db_all_day = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_ALL_DAY));
+                int db_remind = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_REMIND));
                 eventList.add(new Event(db_id, db_event, db_day, db_month, db_year, db_hour, db_minute, db_all_day, db_remind));
             } while (cursor.moveToNext());
         }
@@ -171,10 +177,10 @@ public class CalendarFragment extends Fragment implements AdapterListener{
         if(event.getRemind()>0) {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
             String idAlarm = sp.getString(event.getDay() + "." + event.getMonth() + "." + event.getYear() + "." + event.getHour() + "." + event.getMinute(), "");
-            AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+            AlarmManager alarmManager = (AlarmManager) Objects.requireNonNull(getActivity()).getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(requireContext(), MyReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), Integer.parseInt(idAlarm), intent, 0);
-            alarmManager.cancel(pendingIntent);
+            Objects.requireNonNull(alarmManager).cancel(pendingIntent);
         }
 
         dbHelper = DBHelper.getInstance(requireContext());

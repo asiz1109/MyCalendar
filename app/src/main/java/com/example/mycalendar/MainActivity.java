@@ -3,6 +3,7 @@ package com.example.mycalendar;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -14,8 +15,6 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity{
 
-    CalendarFragment calendarFragment = new CalendarFragment();
-    AddFragment addFragment = new AddFragment();
     private DateTimeTracker dateTimeTracker;
 
     @Override
@@ -40,18 +39,30 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void replaceFragment(int itemId) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        String tag;
         switch (itemId){
             case R.layout.fragment_calendar:
-                getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, calendarFragment)
-                    .commit();
+                tag = String.valueOf(R.layout.fragment_calendar);
+                CalendarFragment calendarFragment = (CalendarFragment) fragmentManager.findFragmentByTag(tag);
+                if (calendarFragment == null) {
+                    calendarFragment = new CalendarFragment();
+                }
+                fragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, calendarFragment, tag)
+                        .addToBackStack(null)
+                        .commit();
                 break;
+
             case R.layout.fragment_add:
                 dateTimeTracker.setTime(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), Calendar.getInstance().get(Calendar.MINUTE));
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.fragment_container, addFragment)
+                tag = String.valueOf(R.layout.fragment_add);
+                AddFragment addFragment = (AddFragment) fragmentManager.findFragmentByTag(tag);
+                if (addFragment == null) {
+                    addFragment = new AddFragment();
+                }
+                fragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, addFragment, tag)
                         .addToBackStack(null)
                         .commit();
         }

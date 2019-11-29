@@ -36,10 +36,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.mycalendar.Alarm.MyReceiver;
+import com.example.mycalendar.BD.DBHelper;
 import com.example.mycalendar.ViewModel.DateTimeTracker;
 import com.example.mycalendar.ViewModel.MainViewModel;
 
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -59,7 +62,6 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     private int mYear, mMonth, mDay, mHour, mMinute;
     private int remind = 0;
 
-//    public static final int RC_MY_ALARM = 101;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -214,18 +216,18 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.tv_date:
-                DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), myDateListener, 2019, 11, 26);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), myDateListener, mYear, mMonth, mDay);
                 datePickerDialog.show();
                 break;
             case R.id.tv_time:
                 Calendar calendar = Calendar.getInstance();
-                TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), myTimeListener, calendar.getTime().getHours(), calendar.getTime().getMinutes(), true);
+                TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), myTimeListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
                 timePickerDialog.show();
                 break;
         }
     }
 
-    DatePickerDialog.OnDateSetListener myDateListener = new DatePickerDialog.OnDateSetListener() {
+    private DatePickerDialog.OnDateSetListener myDateListener = new DatePickerDialog.OnDateSetListener() {
 
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
@@ -233,7 +235,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         }
     };
 
-    TimePickerDialog.OnTimeSetListener myTimeListener = new TimePickerDialog.OnTimeSetListener() {
+    private TimePickerDialog.OnTimeSetListener myTimeListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             dateTimeTracker.setTime(hourOfDay, minute);
         }
@@ -242,10 +244,10 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     private void changeText(){
         String month = String.valueOf(mMonth+1);
         String editMonth = month.length()<2 ? "0"+month : month;
-        tv_date.setText(mDay + "." + editMonth + "." + mYear);
+        tv_date.setText(String.format(Locale.US,"%d.%s.%d", mDay, editMonth, mYear));
         String hour = String.valueOf(mHour).length()<2 ? "0"+mHour : String.valueOf(mHour);
         String minute = String.valueOf(mMinute).length()<2 ? "0"+mMinute : String.valueOf(mMinute);
-        tv_time.setText(hour + ":" + minute);
+        tv_time.setText(String.format(Locale.US, "%s:%s", hour, minute));
     }
 
     private void closeFragment(){
@@ -313,7 +315,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
                 millis = TimeUnit.HOURS.toMillis(1);
                 break;
         }
-        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-        AlarmManagerCompat.setExact(alarmManager, AlarmManager.RTC, calendar.getTimeInMillis()-millis, task);
+        AlarmManager alarmManager = (AlarmManager) Objects.requireNonNull(getActivity()).getSystemService(Context.ALARM_SERVICE);
+        AlarmManagerCompat.setExact(Objects.requireNonNull(alarmManager), AlarmManager.RTC, calendar.getTimeInMillis()-millis, task);
     }
 }

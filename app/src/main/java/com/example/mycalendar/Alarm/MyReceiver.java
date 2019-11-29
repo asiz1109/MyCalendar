@@ -1,4 +1,4 @@
-package com.example.mycalendar;
+package com.example.mycalendar.Alarm;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

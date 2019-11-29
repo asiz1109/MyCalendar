@@ -1,4 +1,4 @@
-package com.example.mycalendar;
+package com.example.mycalendar.BD;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,8 +9,8 @@ import androidx.annotation.Nullable;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "eventsDB";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "eventsDB";
     public static final String TABLE_EVENTS = "events";
 
     public static final String KEY_ID = "_id";
@@ -30,7 +30,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     @NonNull
-    static DBHelper getInstance(Context context){
+    public static DBHelper getInstance(Context context){
         DBHelper instance = mInstance;
         if(instance==null){
             synchronized (DBHelper.class){
@@ -43,8 +43,6 @@ public class DBHelper extends SQLiteOpenHelper {
         return instance;
     }
 
-
-
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create table " + TABLE_EVENTS + "(" + KEY_ID
@@ -53,7 +51,5 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-    }
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { }
 }

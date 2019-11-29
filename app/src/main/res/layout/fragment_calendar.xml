@@ -10,7 +10,6 @@
         android:id="@+id/calendar_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,15 +19,15 @@
         android:id="@+id/fab_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        android:layout_marginEnd="40dp"
-        android:src="@drawable/ic_add_24dp"
-        android:foregroundGravity="center"
+        android:layout_marginEnd="@dimen/padding_40"
+        android:layout_marginBottom="@dimen/padding_40"
         android:clickable="true"
+        android:focusable="true"
+        android:foregroundGravity="center"
+        android:src="@drawable/ic_add_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@color/colorAccent"
-        android:focusable="true" />
+        app:srcCompat="@color/colorAccent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -37,6 +36,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/calendar_view"
-        tools:listitem="@layout/rv_item"/>
+        tools:listitem="@layout/rv_item" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

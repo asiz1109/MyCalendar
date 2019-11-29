@@ -1,4 +1,4 @@
-package com.example.mycalendar;
+package com.example.mycalendar.Alarm;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -12,11 +12,15 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.example.mycalendar.MainActivity;
+import com.example.mycalendar.R;
+
+import java.util.Objects;
+
 public class MyService extends IntentService {
 
     public static final String CHANNEL_ID = "MyServiceChannel";
     public static final int NOTIFICATION_ID = 1;
-
 
     public MyService() {
         super("MyCalendar");
@@ -24,11 +28,11 @@ public class MyService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        String event = intent.getStringExtra("event");
-        String time = intent.getStringExtra("time");
+        final String event = Objects.requireNonNull(intent).getStringExtra("event");
+        final String time = Objects.requireNonNull(intent).getStringExtra("time");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "MyService Channel", NotificationManager.IMPORTANCE_DEFAULT);
-            getSystemService(NotificationManager.class).createNotificationChannel(channel);
+            Objects.requireNonNull(getSystemService(NotificationManager.class)).createNotificationChannel(channel);
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -40,6 +44,5 @@ public class MyService extends IntentService {
                 .build();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(NOTIFICATION_ID, notification);
-//      задача (будильник с событием и временем начала)
     }
 }
