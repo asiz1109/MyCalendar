@@ -294,6 +294,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         sp.edit().putString(key, String.valueOf(idAlarm)).apply();
 
         Intent intent = new Intent(requireContext(), MyReceiver.class);
+        intent.setAction("com.example.mycalendar.ALARM");
         intent.putExtra("event", event).putExtra("time", tv_time.getText().toString());
         PendingIntent task = PendingIntent.getBroadcast(requireContext(), idAlarm, intent, 0);
         Calendar calendar = Calendar.getInstance();

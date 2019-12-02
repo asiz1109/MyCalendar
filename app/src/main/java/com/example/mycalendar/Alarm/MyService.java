@@ -1,6 +1,5 @@
 package com.example.mycalendar.Alarm;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,7 +7,8 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Build;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -17,17 +17,14 @@ import com.example.mycalendar.R;
 
 import java.util.Objects;
 
-public class MyService extends IntentService {
+public class MyService extends JobIntentService {
 
     public static final String CHANNEL_ID = "MyServiceChannel";
     public static final int NOTIFICATION_ID = 1;
 
-    public MyService() {
-        super("MyCalendar");
-    }
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
+    protected void onHandleWork(@NonNull Intent intent) {
         final String event = Objects.requireNonNull(intent).getStringExtra("event");
         final String time = Objects.requireNonNull(intent).getStringExtra("time");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -44,5 +41,8 @@ public class MyService extends IntentService {
                 .build();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(NOTIFICATION_ID, notification);
+
+        stopSelf();
     }
+
 }

@@ -21,8 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".Alarm.MyService" />
-        <receiver android:name=".Alarm.MyReceiver"/>
+        <service android:name=".Alarm.MyService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <receiver android:name=".Alarm.MyReceiver">
+            <intent-filter>
+                <action android:name="com.example.mycalendar.ALARM"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
