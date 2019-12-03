@@ -50,6 +50,8 @@ public class CalendarFragment extends Fragment implements AdapterListener {
     private DBHelper dbHelper;
     private int position;
 
+    public static final String TAG = String.valueOf(R.layout.fragment_calendar);
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

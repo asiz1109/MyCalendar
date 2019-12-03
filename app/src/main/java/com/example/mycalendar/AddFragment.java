@@ -62,6 +62,8 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     private int mYear, mMonth, mDay, mHour, mMinute;
     private int remind = 0;
 
+    public static final String TAG = String.valueOf(R.layout.fragment_add);
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

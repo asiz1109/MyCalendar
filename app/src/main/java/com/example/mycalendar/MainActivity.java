@@ -40,29 +40,26 @@ public class MainActivity extends AppCompatActivity{
 
     private void replaceFragment(int itemId) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        String tag;
         switch (itemId){
             case R.layout.fragment_calendar:
-                tag = String.valueOf(R.layout.fragment_calendar);
-                CalendarFragment calendarFragment = (CalendarFragment) fragmentManager.findFragmentByTag(tag);
+                CalendarFragment calendarFragment = (CalendarFragment) fragmentManager.findFragmentByTag(CalendarFragment.TAG);
                 if (calendarFragment == null) {
                     calendarFragment = new CalendarFragment();
                 }
                 fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, calendarFragment, tag)
+                        .replace(R.id.fragment_container, calendarFragment, CalendarFragment.TAG)
                         .addToBackStack(null)
                         .commit();
                 break;
 
             case R.layout.fragment_add:
                 dateTimeTracker.setTime(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), Calendar.getInstance().get(Calendar.MINUTE));
-                tag = String.valueOf(R.layout.fragment_add);
-                AddFragment addFragment = (AddFragment) fragmentManager.findFragmentByTag(tag);
+                AddFragment addFragment = (AddFragment) fragmentManager.findFragmentByTag(AddFragment.TAG);
                 if (addFragment == null) {
                     addFragment = new AddFragment();
                 }
                 fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, addFragment, tag)
+                        .replace(R.id.fragment_container, addFragment, AddFragment.TAG)
                         .addToBackStack(null)
                         .commit();
         }
