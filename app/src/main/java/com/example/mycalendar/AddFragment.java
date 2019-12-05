@@ -299,7 +299,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         contentValues.put(DBHelper.KEY_ID_ALARM, idAlarm);
         database.insert(DBHelper.TABLE_EVENTS, null, contentValues);
         dbHelper.close();
-        if(remind.getNumber()>0) addAlarm(new Event(1, event, day, month, year, hour, minute, allDay, remind, idAlarm));
+        if(remind.ordinal()>0) addAlarm(new Event(1, event, day, month, year, hour, minute, allDay, remind, idAlarm));
     }
 
     private void addAlarm(Event event){
