@@ -1,5 +1,7 @@
 package com.example.mycalendar.BD;
 
+import com.example.mycalendar.Remind;
+
 public class Event {
 
     private int id;
@@ -10,10 +12,10 @@ public class Event {
     private int hour;
     private int minute;
     private int allDay;
-    private int remind;
+    private Remind remind;
     private int idAlarm;
 
-    public Event(int id, String event, int day, int month, int year, int hour, int minute, int allDay, int remind, int idAlarm) {
+    public Event(int id, String event, int day, int month, int year, int hour, int minute, int allDay, Remind remind, int idAlarm) {
         this.id = id;
         this.event = event;
         this.day = day;
@@ -90,11 +92,11 @@ public class Event {
         this.allDay = allDay;
     }
 
-    public int getRemind() {
+    public Remind getRemind() {
         return remind;
     }
 
-    public void setRemind(int remind) {
+    public void setRemind(Remind remind) {
         this.remind = remind;
     }
 

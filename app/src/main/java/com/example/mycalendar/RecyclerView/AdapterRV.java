@@ -72,16 +72,16 @@ public class AdapterRV extends RecyclerView.Adapter<AdapterRV.ViewHolderRV> {
             }
 
             switch (event.getRemind()){
-                case 0:
+                case notRemind:
                     tv_remind.setText("");
                     break;
-                case 1:
+                case remind_10minuts:
                     tv_remind.setText(R.string.remind_in_10_minutes);
                     break;
-                case 2:
+                case remind_30minuts:
                     tv_remind.setText(R.string.remind_in_30_minutes);
                     break;
-                case 3:
+                case remind_1hour:
                     tv_remind.setText(R.string.remind_in_1_hour);
                     break;
             }

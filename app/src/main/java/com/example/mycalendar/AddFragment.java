@@ -49,6 +49,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static com.example.mycalendar.Remind.*;
+
 
 public class AddFragment extends Fragment implements View.OnClickListener {
 
@@ -62,13 +64,9 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     private DBHelper dbHelper;
 
     private int mYear, mMonth, mDay, mHour, mMinute;
-    private int remind = 0;
+    private Remind remind;
 
     public static final String TAG = String.valueOf(R.layout.fragment_add);
-    private static final int NOT_REMIND = 0;
-    private static final int REMIND_10_MINUTES = 1;
-    private static final int REMIND_30_MINUTES = 2;
-    private static final int REMIND_1_HOUR = 3;
     private static final long REMIND_10_MINUTES_MILLIS = TimeUnit.MINUTES.toMillis(10);
     private static final long REMIND_30_MINUTES_MILLIS = TimeUnit.MINUTES.toMillis(30);
     private static final long REMIND_1_HOUR_MILLIS = TimeUnit.HOURS.toMillis(1);
@@ -105,16 +103,16 @@ public class AddFragment extends Fragment implements View.OnClickListener {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId){
                     case R.id.rb_not:
-                        remind = NOT_REMIND;
+                        remind = notRemind;
                         break;
                     case R.id.rb_10m:
-                        remind = REMIND_10_MINUTES;
+                        remind = remind_10minuts;
                         break;
                     case R.id.rb_30m:
-                        remind = REMIND_30_MINUTES;
+                        remind = remind_30minuts;
                         break;
                     case R.id.rb_1h:
-                        remind = REMIND_1_HOUR;
+                        remind = remind_1hour;
                         break;
                 }
             }
@@ -297,11 +295,11 @@ public class AddFragment extends Fragment implements View.OnClickListener {
             contentValues.put(DBHelper.KEY_MINUTE, minute);
         }
         contentValues.put(DBHelper.KEY_ALL_DAY, allDay);
-        contentValues.put(DBHelper.KEY_REMIND, remind);
+        contentValues.put(DBHelper.KEY_REMIND, remind.ordinal());
         contentValues.put(DBHelper.KEY_ID_ALARM, idAlarm);
         database.insert(DBHelper.TABLE_EVENTS, null, contentValues);
         dbHelper.close();
-        if(remind>0) addAlarm(new Event(1, event, day, month, year, hour, minute, allDay, remind, idAlarm));
+        if(remind.getNumber()>0) addAlarm(new Event(1, event, day, month, year, hour, minute, allDay, remind, idAlarm));
     }
 
     private void addAlarm(Event event){
@@ -318,13 +316,13 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         calendar.set(Calendar.SECOND, 0);
         long millis = 0;
         switch (remind){
-            case 1:
+            case remind_10minuts:
                 millis = REMIND_10_MINUTES_MILLIS;
                 break;
-            case 2:
+            case remind_30minuts:
                 millis = REMIND_30_MINUTES_MILLIS;
                 break;
-            case 3:
+            case remind_1hour:
                 millis = REMIND_1_HOUR_MILLIS;
                 break;
         }

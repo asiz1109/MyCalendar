@@ -131,7 +131,8 @@ public class CalendarFragment extends Fragment implements AdapterListener {
                 int db_all_day = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_ALL_DAY));
                 int db_remind = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_REMIND));
                 int db_id_alarm = cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_ID_ALARM));
-                eventList.add(new Event(db_id, db_event, db_day, db_month, db_year, db_hour, db_minute, db_all_day, db_remind, db_id_alarm));
+                Remind [] reminds = Remind.values();
+                eventList.add(new Event(db_id, db_event, db_day, db_month, db_year, db_hour, db_minute, db_all_day, reminds[db_remind], db_id_alarm));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -177,7 +178,7 @@ public class CalendarFragment extends Fragment implements AdapterListener {
 
     private void deleteEvent(){
         Event event = eventList.get(position);
-        if(event.getRemind()>0) {
+        if(event.getRemind()!=Remind.notRemind) {
             AlarmManager alarmManager = (AlarmManager) Objects.requireNonNull(getActivity()).getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(requireContext(), MyReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), event.getIdAlarm(), intent, 0);
