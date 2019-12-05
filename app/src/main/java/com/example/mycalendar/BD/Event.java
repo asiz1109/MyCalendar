@@ -11,8 +11,9 @@ public class Event {
     private int minute;
     private int allDay;
     private int remind;
+    private int idAlarm;
 
-    public Event(int id, String event, int day, int month, int year, int hour, int minute, int allDay, int remind) {
+    public Event(int id, String event, int day, int month, int year, int hour, int minute, int allDay, int remind, int idAlarm) {
         this.id = id;
         this.event = event;
         this.day = day;
@@ -22,6 +23,7 @@ public class Event {
         this.minute = minute;
         this.allDay = allDay;
         this.remind = remind;
+        this.idAlarm = idAlarm;
     }
 
     public int getId() {
@@ -94,5 +96,13 @@ public class Event {
 
     public void setRemind(int remind) {
         this.remind = remind;
+    }
+
+    public int getIdAlarm() {
+        return idAlarm;
+    }
+
+    public void setIdAlarm(int idAlarm) {
+        this.idAlarm = idAlarm;
     }
 }

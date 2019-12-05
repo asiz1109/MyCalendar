@@ -22,6 +22,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_MINUTE = "minute";
     public static final String KEY_ALL_DAY = "all_day";
     public static final String KEY_REMIND = "remind";
+    public static final String KEY_ID_ALARM = "id_alarm";
 
     private static volatile DBHelper mInstance;
 
@@ -47,7 +48,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create table " + TABLE_EVENTS + "(" + KEY_ID
                 + " integer primary key autoincrement," + KEY_EVENT + " text," + KEY_DAY + " integer," + KEY_MONTH + " integer," + KEY_YEAR + " integer," + KEY_HOUR + " integer,"
-                + KEY_MINUTE + " integer," + KEY_ALL_DAY + " integer," + KEY_REMIND + " integer"+ ")");
+                + KEY_MINUTE + " integer," + KEY_ALL_DAY + " integer," + KEY_REMIND + " integer," + KEY_ID_ALARM + " integer" + ")");
     }
 
     @Override

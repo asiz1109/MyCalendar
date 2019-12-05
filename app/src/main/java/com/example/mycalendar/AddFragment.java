@@ -38,6 +38,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.mycalendar.Alarm.MyReceiver;
 import com.example.mycalendar.BD.DBHelper;
+import com.example.mycalendar.BD.Event;
 import com.example.mycalendar.ViewModel.DateTimeTracker;
 import com.example.mycalendar.ViewModel.MainViewModel;
 
@@ -45,6 +46,7 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 
@@ -63,6 +65,15 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     private int remind = 0;
 
     public static final String TAG = String.valueOf(R.layout.fragment_add);
+    private static final int NOT_REMIND = 0;
+    private static final int REMIND_10_MINUTES = 1;
+    private static final int REMIND_30_MINUTES = 2;
+    private static final int REMIND_1_HOUR = 3;
+    private static final long REMIND_10_MINUTES_MILLIS = TimeUnit.MINUTES.toMillis(10);
+    private static final long REMIND_30_MINUTES_MILLIS = TimeUnit.MINUTES.toMillis(30);
+    private static final long REMIND_1_HOUR_MILLIS = TimeUnit.HOURS.toMillis(1);
+    public static final String KEY_EVENT = "event";
+    public static final String KEY_TIME = "time";
 
 
     @Override
@@ -94,16 +105,16 @@ public class AddFragment extends Fragment implements View.OnClickListener {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId){
                     case R.id.rb_not:
-                        remind = 0;
+                        remind = NOT_REMIND;
                         break;
                     case R.id.rb_10m:
-                        remind = 1;
+                        remind = REMIND_10_MINUTES;
                         break;
                     case R.id.rb_30m:
-                        remind = 2;
+                        remind = REMIND_30_MINUTES;
                         break;
                     case R.id.rb_1h:
-                        remind = 3;
+                        remind = REMIND_1_HOUR;
                         break;
                 }
             }
@@ -157,35 +168,35 @@ public class AddFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onChanged(Integer integer) {
                 mYear = integer;
-                changeText();
+                changeTextDate();
             }
         });
         dateTimeTracker.getMonth().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 mMonth = integer;
-                changeText();
+                changeTextDate();
             }
         });
         dateTimeTracker.getDay().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 mDay = integer;
-                changeText();
+                changeTextDate();
             }
         });
         dateTimeTracker.getHour().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 mHour = integer;
-                changeText();
+                changeTextTime();
             }
         });
         dateTimeTracker.getMinute().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 mMinute = integer;
-                changeText();
+                changeTextTime();
             }
         });
     }
@@ -230,7 +241,6 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     }
 
     private DatePickerDialog.OnDateSetListener myDateListener = new DatePickerDialog.OnDateSetListener() {
-
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
             dateTimeTracker.setDate(year, monthOfYear, dayOfMonth);
@@ -243,10 +253,13 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         }
     };
 
-    private void changeText(){
+    private void changeTextDate(){
         String month = String.valueOf(mMonth+1);
         String editMonth = month.length()<2 ? "0"+month : month;
         tv_date.setText(String.format(Locale.US,"%d.%s.%d", mDay, editMonth, mYear));
+    }
+
+    private void changeTextTime(){
         String hour = String.valueOf(mHour).length()<2 ? "0"+mHour : String.valueOf(mHour);
         String minute = String.valueOf(mMinute).length()<2 ? "0"+mMinute : String.valueOf(mMinute);
         tv_time.setText(String.format(Locale.US, "%s:%s", hour, minute));
@@ -268,6 +281,8 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         int hour = Objects.requireNonNull(dateTimeTracker.getHour().getValue());
         int minute = Objects.requireNonNull(dateTimeTracker.getMinute().getValue());
         int allDay = cb_all_day.isChecked()? 1 : 0;
+        Random random_idAlarm = new Random(System.currentTimeMillis());
+        int idAlarm = random_idAlarm.nextInt(214748364);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(DBHelper.KEY_EVENT, event);
@@ -283,39 +298,34 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         }
         contentValues.put(DBHelper.KEY_ALL_DAY, allDay);
         contentValues.put(DBHelper.KEY_REMIND, remind);
+        contentValues.put(DBHelper.KEY_ID_ALARM, idAlarm);
         database.insert(DBHelper.TABLE_EVENTS, null, contentValues);
         dbHelper.close();
-        if(remind>0) addAlarm(event, day, month, year, hour, minute);
+        if(remind>0) addAlarm(new Event(1, event, day, month, year, hour, minute, allDay, remind, idAlarm));
     }
 
-    private void addAlarm(String event, int day, int month, int year, int hour, int minute){
-        Random random_idAlarm = new Random(System.currentTimeMillis());
-        final int idAlarm = random_idAlarm.nextInt(214748364);
-        String key = day+"."+month+"."+year+"."+hour+"."+minute;
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(requireContext());
-        sp.edit().putString(key, String.valueOf(idAlarm)).apply();
-
+    private void addAlarm(Event event){
         Intent intent = new Intent(requireContext(), MyReceiver.class);
-        intent.setAction("com.example.mycalendar.ALARM");
-        intent.putExtra("event", event).putExtra("time", tv_time.getText().toString());
-        PendingIntent task = PendingIntent.getBroadcast(requireContext(), idAlarm, intent, 0);
+        intent.setAction(MyApp.ALARM);
+        intent.putExtra(KEY_EVENT, event.getEvent()).putExtra(KEY_TIME, tv_time.getText().toString());
+        PendingIntent task = PendingIntent.getBroadcast(requireContext(), event.getIdAlarm(), intent, 0);
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.DAY_OF_MONTH, event.getDay());
+        calendar.set(Calendar.MONTH, event.getMonth());
+        calendar.set(Calendar.YEAR, event.getYear());
+        calendar.set(Calendar.HOUR_OF_DAY, event.getHour());
+        calendar.set(Calendar.MINUTE, event.getMinute());
         calendar.set(Calendar.SECOND, 0);
         long millis = 0;
         switch (remind){
             case 1:
-                millis = TimeUnit.MINUTES.toMillis(10);
+                millis = REMIND_10_MINUTES_MILLIS;
                 break;
             case 2:
-                millis = TimeUnit.MINUTES.toMillis(30);
+                millis = REMIND_30_MINUTES_MILLIS;
                 break;
             case 3:
-                millis = TimeUnit.HOURS.toMillis(1);
+                millis = REMIND_1_HOUR_MILLIS;
                 break;
         }
         AlarmManager alarmManager = (AlarmManager) Objects.requireNonNull(getActivity()).getSystemService(Context.ALARM_SERVICE);
