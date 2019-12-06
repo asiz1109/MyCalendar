@@ -64,7 +64,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     private DBHelper dbHelper;
 
     private int mYear, mMonth, mDay, mHour, mMinute;
-    private Remind remind;
+    private Remind remind = notRemind;
 
     public static final String TAG = String.valueOf(R.layout.fragment_add);
     private static final long REMIND_10_MINUTES_MILLIS = TimeUnit.MINUTES.toMillis(10);
